@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queue-entries>
+	<queue>
+		<name>default</name>
+		<rate>1/s</rate>
+		<retry-parameters>
+			<task-retry-limit>10</task-retry-limit>
+			<task-age-limit>1h</task-age-limit>
+		</retry-parameters>
+	</queue>
+</queue-entries>

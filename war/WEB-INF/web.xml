@@ -4,5 +4,21 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-  
+	<servlet>
+		<servlet-name>IncomingWebhookServlet</servlet-name>
+		<servlet-class>net.hazychill.ikafs.webhooks.IncomingWebhookServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>IncomingWebhookServlet</servlet-name>
+		<url-pattern>/webhook/*</url-pattern>
+	</servlet-mapping>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>admin</web-resource-name>
+			<url-pattern>/webhook/admin/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
 </web-app>
