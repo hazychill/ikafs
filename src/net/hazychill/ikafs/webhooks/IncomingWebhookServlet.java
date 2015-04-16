@@ -40,7 +40,6 @@ public class IncomingWebhookServlet extends HttpServlet {
 		else {
 			resp.setStatus(IkafsConstants.STATUS_CODE_METHOD_NOT_ALLOWED);
 		}
-		
 	}
 
 	@Override

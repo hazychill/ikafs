@@ -9,6 +9,9 @@ public class IkafsConstants {
 	public static final String PATH_WEBHOOK_TASK_SEND = "/task/send";
 	public static final String PATH_WEBHOOK_ADD_TEAM = "/admin/add_team";
 	
+	public static final String REQUEST_PARAM_NAME_TEAM_NAME = "teamName";
+	public static final String REQUEST_PARAM_NAME_WEBHOOK_URL = "webhookUrl";
+	
 	public static final int STATUS_CODE_OK = 200;
 	public static final int STATUS_CODE_BAD_REQUEST = 400;
 	public static final int STATUS_CODE_FORBIDDEN = 403;
@@ -20,6 +23,7 @@ public class IkafsConstants {
 	public static final String HTTP_METHOD_POST = "POST";
 	public static final String HTTP_HEADER_NAME_CONTENT_TYPE = "Content-Type";
 	public static final String MIME_TYPE_JSON = "application/json";
+	public static final String HTTP_HEADER_VALUE_CONTENT_TYPE_TEXT_HTML = "text/html";
 	
 	
 	public static final int MAX_JSON_PAYLOAD_BYTES = 3 * 1024 * 1024;
@@ -42,8 +46,4 @@ public class IkafsConstants {
 	public static final int MESSAGE_SPEC_SEND_STATUS_SENDING = 1;
 	public static final int MESSAGE_SPEC_SEND_STATUS_SENT = 2;
 	public static final int MESSAGE_SPEC_SEND_STATUS_ERROR = -1;
-	
-	public static final String RESOURCE_PATH_IKAFS_PROPERTIES = "/WEB-INF/ikafs.properties";
-	
-	public static final String PROPERTY_KEY_ADMIN_USER_EMAIL = "admin_email";
 }
