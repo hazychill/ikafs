@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <application></application>
+  <application>__put_your_application_id__</application>
   <version>1</version>
 
   <!--
@@ -11,6 +11,8 @@
   <!-- Configure java.util.logging -->
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+    <property name="ikafs.service.email" value="<put email of service account (required only for development server)>" />
+    <property name="ikafs.service.p12.path" value="<put path to p12 file; e.g. /WEB-INF/filename.p12 (required only for development server)" />
   </system-properties>
 
   <!--
