@@ -48,7 +48,6 @@ public class FindSourcesHandler implements IkafsRequestHandler {
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
 		Logger logger = Logger.getLogger(IkafsConstants.LOGGER_NAME);
-		logger.info("test message");
 		try {
 			List<FeedSourceSheet> sourceSheets = Datastore.query(FeedSourceSheet.class).asList();
 
@@ -185,11 +184,8 @@ public class FindSourcesHandler implements IkafsRequestHandler {
 			AppIdentityCredential credential = new AppIdentityCredential(Collections.singleton(DriveScopes.DRIVE));
 			HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			JsonFactory jsonFactory = new JacksonFactory();
-//			service = new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName(IkafsConstants.APPLICATION_NAME).build();
-			GoogleClientRequestInitializer keyInitializer = new CommonGoogleClientRequestInitializer(System.getProperty("ikafs.service.client.id"));
 			service = new Drive.Builder(httpTransport, jsonFactory, null)
 				.setHttpRequestInitializer(credential)
-				.setGoogleClientRequestInitializer(keyInitializer)
 				.setApplicationName(IkafsConstants.APPLICATION_NAME)
 				.build();
 		}
