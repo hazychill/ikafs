@@ -18,6 +18,8 @@ public class WebFeedServiceServlet extends HttpServlet {
 	public WebFeedServiceServlet() {
 		handlers = new HashMap<String, IkafsRequestHandler>();
 		handlers.put(IkafsConstants.PATH_WEBFEED_FIND_SOURCES, new FindSourcesHandler());
+		handlers.put(IkafsConstants.PATH_WEBFEED_INIT_DOWNLOAD_FEED, new InitDownloadFeedHandler());
+		handlers.put(IkafsConstants.PATH_WEBFEED_DOWNLOAD_FEED, new DownloadFeedHandler());
 		handlers.put(IkafsConstants.PATH_WEBFEED_ADD_SOURCE, new AddSourceHandler());
 	}
 

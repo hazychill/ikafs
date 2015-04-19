@@ -10,6 +10,8 @@ public class IkafsConstants {
 	public static final String PATH_WEBHOOK_ADD_TEAM = "/admin/add_team";
 
 	public static final String PATH_WEBFEED_FIND_SOURCES = "/task/find_sources";
+	public static final String PATH_WEBFEED_INIT_DOWNLOAD_FEED = "/task/init_download_feed";
+	public static final String PATH_WEBFEED_DOWNLOAD_FEED = "/task/download_feed";
 	public static final String PATH_WEBFEED_ADD_SOURCE = "/admin/add_source";
 
 	public static final String REQUEST_PARAM_NAME_TEAM_NAME = "teamName";
@@ -41,6 +43,7 @@ public class IkafsConstants {
 	public static final String QUEUE_PARAM_NAME_CACHE_KEY = "cacheKey";
 	public static final String QUEUE_PARAM_NAME_SEND_GROUP = "sendGroup";
 	public static final String QUEUE_PARAM_NAME_MESSAGE_KEY = "messageKey";
+	public static final String QUEUE_PARAM_NAME_URL = "url";
 
 	public static final String JSON_KEY_DESCTINATION = "destination";
 	public static final String JSON_KEY_MESSAGE = "message";

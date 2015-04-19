@@ -26,12 +26,11 @@ import net.hazychill.ikafs.models.FeedUrl;
 import net.hazychill.ikafs.webhooks.IkafsServletException;
 
 import org.slim3.datastore.Datastore;
+import org.slim3.datastore.EntityNotFoundRuntimeException;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.googleapis.services.CommonGoogleClientRequestInitializer;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
@@ -40,7 +39,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.Permission;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.utils.SystemProperty;
 
 public class FindSourcesHandler implements IkafsRequestHandler {
@@ -77,18 +76,32 @@ public class FindSourcesHandler implements IkafsRequestHandler {
 
 			List<Object> models = new ArrayList<Object>();
 			for (String url : feedMap.keySet()) {
-				FeedUrl feedUrl = new FeedUrl();
-				feedUrl.setKey(Datastore.createKey(FeedUrl.class, url));
-				feedUrl.setUpdated(false);
-				feedUrl.setUpdatedTime(new Date());
+				FeedUrl feedUrl;
+				Key feedUrlKey = Datastore.createKey(FeedUrl.class, url);
+				try {
+					feedUrl = Datastore.get(FeedUrl.class, feedUrlKey);
+				}
+				catch (EntityNotFoundRuntimeException e) {
+					feedUrl = new FeedUrl();
+					feedUrl.setKey(feedUrlKey);
+					feedUrl.setUpdated(new Date());
+				}
+				feedUrl.setActive(true);
 				models.add(feedUrl);
 				List<String> teamChannelList = feedMap.get(url);
 				for (String teamChannel : teamChannelList) {
-					FeedChannelRelation feedChannelRelation = new FeedChannelRelation();
-					feedChannelRelation.setTeamChannel(teamChannel);
+					FeedChannelRelation feedChannelRelation;
+					Key fcrKey = Datastore.createKey(feedUrlKey, FeedChannelRelation.class, teamChannel);
+					try {
+						feedChannelRelation = Datastore.get(FeedChannelRelation.class, fcrKey);
+					}
+					catch (EntityNotFoundRuntimeException e) {
+						feedChannelRelation = new FeedChannelRelation();
+						feedChannelRelation.setKey(fcrKey);
+						feedChannelRelation.setUpdated(new Date());
+					}
 					feedChannelRelation.setUrl(url);
-					feedChannelRelation.setPosted(false);
-					feedChannelRelation.setPostedTime(new Date());
+					feedChannelRelation.setActive(true);
 					models.add(feedChannelRelation);
 				}
 			}
@@ -184,10 +197,7 @@ public class FindSourcesHandler implements IkafsRequestHandler {
 			AppIdentityCredential credential = new AppIdentityCredential(Collections.singleton(DriveScopes.DRIVE));
 			HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			JsonFactory jsonFactory = new JacksonFactory();
-			service = new Drive.Builder(httpTransport, jsonFactory, null)
-				.setHttpRequestInitializer(credential)
-				.setApplicationName(IkafsConstants.APPLICATION_NAME)
-				.build();
+			service = new Drive.Builder(httpTransport, jsonFactory, null).setHttpRequestInitializer(credential).setApplicationName(IkafsConstants.APPLICATION_NAME).build();
 		}
 		else if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
 			URL url = servlet.getServletContext().getResource(System.getProperty(IkafsConstants.SYSPROP_KEY_SERVICE_P12_PATH));

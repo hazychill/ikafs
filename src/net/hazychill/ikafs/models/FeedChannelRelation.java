@@ -11,10 +11,9 @@ import com.google.appengine.api.datastore.Key;
 public class FeedChannelRelation {
 	@Attribute(primaryKey = true)
 	Key key;
-	String teamChannel;
 	String url;
-	boolean posted;
-	Date postedTime;
+	boolean active;
+	Date updated;
 
 	public Key getKey() {
 		return key;
@@ -22,14 +21,6 @@ public class FeedChannelRelation {
 
 	public void setKey(Key key) {
 		this.key = key;
-	}
-
-	public String getTeamChannel() {
-		return teamChannel;
-	}
-
-	public void setTeamChannel(String teamChannel) {
-		this.teamChannel = teamChannel;
 	}
 
 	public String getUrl() {
@@ -40,20 +31,20 @@ public class FeedChannelRelation {
 		this.url = url;
 	}
 
-	public boolean isPosted() {
-		return posted;
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setPosted(boolean posted) {
-		this.posted = posted;
+	public void setActive(boolean posted) {
+		this.active = posted;
 	}
 
-	public Date getPostedTime() {
-		return postedTime;
+	public Date getUpdated() {
+		return updated;
 	}
 
-	public void setPostedTime(Date postedTime) {
-		this.postedTime = postedTime;
+	public void setUpdated(Date postedTime) {
+		this.updated = postedTime;
 	}
 
 }

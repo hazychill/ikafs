@@ -11,8 +11,8 @@ import com.google.appengine.api.datastore.Key;
 public class FeedUrl {
 	@Attribute(primaryKey = true)
 	Key key;
-	boolean updated;
-	Date updatedTime;
+	boolean active;
+	Date updated;
 
 	public Key getKey() {
 		return key;
@@ -22,20 +22,20 @@ public class FeedUrl {
 		this.key = key;
 	}
 
-	public boolean isUpdated() {
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean updated) {
+		this.active = updated;
+	}
+
+	public Date getUpdated() {
 		return updated;
 	}
 
-	public void setUpdated(boolean updated) {
-		this.updated = updated;
-	}
-
-	public Date getUpdatedTime() {
-		return updatedTime;
-	}
-
-	public void setUpdatedTime(Date updatedTime) {
-		this.updatedTime = updatedTime;
+	public void setUpdated(Date updatedTime) {
+		this.updated = updatedTime;
 	}
 
 }
