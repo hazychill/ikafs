@@ -59,7 +59,7 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 
 			for (Object entryObj : feed.getEntries()) {
 				SyndEntry entry = (SyndEntry) entryObj;
-				FeedEntry entryModel = readEntry(entry, feedTitle);
+				FeedEntry entryModel = readEntry(entry, urlParam, feedTitle);
 				modelList.add(entryModel);
 			}
 
@@ -101,7 +101,7 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 		}
 	}
 
-	private FeedEntry readEntry(SyndEntry entry, String feedTitle) {
+	private FeedEntry readEntry(SyndEntry entry, String feedUrl, String feedTitle) {
 		int maxSummaryLength = 200;
 
 		String link;
@@ -128,7 +128,7 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 				summary = content.getValue().substring(0, summaryLength);
 			}
 			else {
-				String contentValue = content.getValue().replaceAll("(?s)<.+?>", "");
+				String contentValue = content.getValue().replaceAll("(?s)<.+?>", " ");
 				int contentLength = contentValue.length();
 				int summaryLength = (contentLength < maxSummaryLength) ? (contentLength) : (maxSummaryLength);
 				summary = contentValue.substring(0, summaryLength);
@@ -143,7 +143,7 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 				summary = content.getValue().substring(0, summaryLength);
 			}
 			else {
-				String contentValue = content.getValue().replaceAll("(?s)<.+?>", "");
+				String contentValue = content.getValue().replaceAll("(?s)<.+?>", " ");
 				int contentLength = contentValue.length();
 				int summaryLength = (contentLength < maxSummaryLength) ? (contentLength) : (maxSummaryLength);
 				summary = contentValue.substring(0, summaryLength);
@@ -170,6 +170,7 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 		FeedEntry entryModel = new FeedEntry();
 		Key key = Datastore.createKey(FeedEntry.class, link);
 		entryModel.setKey(key);
+		entryModel.setFeedUrl(feedUrl);
 		entryModel.setFeedTitle(feedTitle);
 		entryModel.setTitle(title);
 		entryModel.setUpdated(updated);

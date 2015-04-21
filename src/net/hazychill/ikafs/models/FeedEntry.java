@@ -11,6 +11,7 @@ import com.google.appengine.api.datastore.Key;
 public class FeedEntry {
 	@Attribute(primaryKey = true)
 	Key key;
+	String feedUrl;
 	@Attribute(unindexed = false)
 	String feedTitle;
 	@Attribute(unindexed = false)
@@ -27,6 +28,14 @@ public class FeedEntry {
 
 	public void setKey(Key key) {
 		this.key = key;
+	}
+
+	public String getFeedUrl() {
+		return feedUrl;
+	}
+
+	public void setFeedUrl(String feedUrl) {
+		this.feedUrl = feedUrl;
 	}
 
 	public String getFeedTitle() {

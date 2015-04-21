@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes autoGenerate="false">
+    <datastore-index kind="FeedEntry" ancestor="false" source="auto">
+        <property name="feedUrl" direction="asc"/>
+        <property name="updated" direction="asc"/>
+    </datastore-index>
+</datastore-indexes>

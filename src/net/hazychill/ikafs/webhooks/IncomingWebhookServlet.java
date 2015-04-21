@@ -14,7 +14,7 @@ import net.hazychill.ikafs.IkafsRequestHandler;
 
 public class IncomingWebhookServlet extends HttpServlet {
 	private Map<String, IkafsRequestHandler> handlers;
-	
+
 	public IncomingWebhookServlet() {
 		handlers = new HashMap<String, IkafsRequestHandler>();
 		handlers.put(IkafsConstants.PATH_WEBHOOK_REQUEST, new ReceiveMessageRequestHandler());
@@ -23,19 +23,14 @@ public class IncomingWebhookServlet extends HttpServlet {
 		handlers.put(IkafsConstants.PATH_WEBHOOK_TASK_SEND, new SendMessageHandler());
 		handlers.put(IkafsConstants.PATH_WEBHOOK_ADD_TEAM, new AddTeamHandler());
 	}
-	
+
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
-		if (IkafsConstants.PATH_WEBHOOK_ADD_TEAM.equals(path)) {
-			if (handlers.containsKey(path)) {
-				IkafsRequestHandler handler = handlers.get(path);
-				handler.handle(req, resp, this);
-			}
-			else {
-				resp.setStatus(IkafsConstants.STATUS_CODE_METHOD_NOT_ALLOWED);
-			}
+
+		if (handlers.containsKey(path)) {
+			IkafsRequestHandler handler = handlers.get(path);
+			handler.handle(req, resp, this);
 		}
 		else {
 			resp.setStatus(IkafsConstants.STATUS_CODE_METHOD_NOT_ALLOWED);
@@ -43,10 +38,9 @@ public class IncomingWebhookServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
-		
+
 		if (handlers.containsKey(path)) {
 			IkafsRequestHandler handler = handlers.get(path);
 			handler.handle(req, resp, this);

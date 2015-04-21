@@ -20,6 +20,7 @@ public class WebFeedServiceServlet extends HttpServlet {
 		handlers.put(IkafsConstants.PATH_WEBFEED_FIND_SOURCES, new FindSourcesHandler());
 		handlers.put(IkafsConstants.PATH_WEBFEED_INIT_DOWNLOAD_FEED, new InitDownloadFeedHandler());
 		handlers.put(IkafsConstants.PATH_WEBFEED_DOWNLOAD_FEED, new DownloadFeedHandler());
+		handlers.put(IkafsConstants.PATH_WEBFEED_REQUEST_POST_MESSAGE, new RequestPostMessageHandler());
 		handlers.put(IkafsConstants.PATH_WEBFEED_ADD_SOURCE, new AddSourceHandler());
 	}
 
@@ -27,14 +28,9 @@ public class WebFeedServiceServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
 
-		if (IkafsConstants.PATH_WEBFEED_ADD_SOURCE.equals(path)) {
-			if (handlers.containsKey(path)) {
-				IkafsRequestHandler handler = handlers.get(path);
-				handler.handle(req, resp, this);
-			}
-			else {
-				resp.setStatus(IkafsConstants.STATUS_CODE_METHOD_NOT_ALLOWED);
-			}
+		if (handlers.containsKey(path)) {
+			IkafsRequestHandler handler = handlers.get(path);
+			handler.handle(req, resp, this);
 		}
 		else {
 			resp.setStatus(IkafsConstants.STATUS_CODE_METHOD_NOT_ALLOWED);

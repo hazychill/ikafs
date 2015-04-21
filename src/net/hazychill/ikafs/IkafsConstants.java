@@ -3,6 +3,7 @@ package net.hazychill.ikafs;
 import java.nio.charset.Charset;
 
 public class IkafsConstants {
+	public static final String PATH_SERVLET_CONTEXT_WEBHOOK = "/webhook";
 	public static final String PATH_WEBHOOK_REQUEST = "/request";
 	public static final String PATH_WEBHOOK_TASK_PUSH = "/task/push";
 	public static final String PATH_WEBHOOK_TASK_INIT_SEND = "/task/init_send";
@@ -12,6 +13,7 @@ public class IkafsConstants {
 	public static final String PATH_WEBFEED_FIND_SOURCES = "/task/find_sources";
 	public static final String PATH_WEBFEED_INIT_DOWNLOAD_FEED = "/task/init_download_feed";
 	public static final String PATH_WEBFEED_DOWNLOAD_FEED = "/task/download_feed";
+	public static final String PATH_WEBFEED_REQUEST_POST_MESSAGE = "/task/request_post_message";
 	public static final String PATH_WEBFEED_ADD_SOURCE = "/admin/add_source";
 
 	public static final String REQUEST_PARAM_NAME_TEAM_NAME = "teamName";
@@ -26,6 +28,7 @@ public class IkafsConstants {
 	public static final int STATUS_CODE_METHOD_NOT_ALLOWED = 405;
 	public static final int STATUS_CODE_LENGTH_REQUIRED = 411;
 	public static final int STATUS_CODE_REQUEST_ENTITY_TOO_LARGE = 413;
+	public static final int STATUS_CODE_INTERNAL_SERVER_ERROR = 500;
 
 	public static final String HTTP_METHOD_POST = "POST";
 	public static final String HTTP_HEADER_NAME_CONTENT_TYPE = "Content-Type";
@@ -45,8 +48,23 @@ public class IkafsConstants {
 	public static final String QUEUE_PARAM_NAME_MESSAGE_KEY = "messageKey";
 	public static final String QUEUE_PARAM_NAME_URL = "url";
 
+	public static final String SEND_GROUP_FEED_ENTRIES = "1F373A72-A740-4A61-723A-371F40A7614A";
+
 	public static final String JSON_KEY_DESCTINATION = "destination";
 	public static final String JSON_KEY_MESSAGE = "message";
+	public static final String JSON_KEY_CHANNEL = "channel";
+	public static final String JSON_KEY_USERNAME = "username";
+	public static final String JSON_KEY_ATTACHMENTS = "attachments";
+	public static final String JSON_KEY_FALLBACK = "fallback";
+	public static final String JSON_KEY_TITLE = "title";
+	public static final String JSON_KEY_TITLELINK = "title_link";
+	public static final String JSON_KEY_TEXT = "text";
+	public static final String JSON_KEY_IMAGEURL = "image_url";
+	public static final String JSON_KEY_ICONEMOJI = "icon_emoji";
+
+	public static final String JSON_VALUE_ICONEMOJI_WEBFEED = ":webfeed_blue:";
+
+	public static final String MESSAGE_FORMAT_FALLBACK = "<{0}|{1}>";
 
 	public static final String LOGGER_NAME = "ikafslogger";
 

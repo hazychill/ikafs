@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+	<cron>
+		<url>/webfeed/task/find_sources</url>
+		<description>find feed sources</description>
+		<schedule>every 1 hours from 00:45 to 23:45</schedule>
+	</cron>
+	<cron>
+		<url>/webfeed/task/init_download_feed</url>
+		<description>download feed entries</description>
+		<schedule>every 1 hours from 00:50 to 23:50</schedule>
+	</cron>
+	<cron>
+		<url>/webfeed/task/request_post_message</url>
+		<description>create message for updated feed entryes</description>
+		<schedule>every 1 hours from 00:55 to 23:55</schedule>
+	</cron>
+	<cron>
+		<url>/webhook/task/init_send?sendGroup=1F373A72-A740-4A61-723A-371F40A7614A</url>
+		<description>post messages to slack</description>
+		<schedule>every 1 hours from 00:00 to 23:00</schedule>
+	</cron>
+</cronentries>

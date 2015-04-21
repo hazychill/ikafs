@@ -32,35 +32,41 @@ public class PushMessageQueueHandler implements IkafsRequestHandler {
 		Logger logger = Logger.getLogger(IkafsConstants.LOGGER_NAME);
 		try {
 			String cacheKey = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_CACHE_KEY);
+			String sendGroup = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_SEND_GROUP);
 			MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
-			String jsonObjStr = (String)ms.get(cacheKey);
+			String jsonObjStr = (String) ms.get(cacheKey);
 			JSONObject jsonObj = new JSONObject(jsonObjStr);
 			String destinationTeam = jsonObj.getString(IkafsConstants.JSON_KEY_DESCTINATION);
 			JSONObject jsonPayload = jsonObj.getJSONObject(IkafsConstants.JSON_KEY_MESSAGE);
 			String jsonPayloadText = jsonPayload.toString();
-			
-			String sendGroup = UUID.randomUUID().toString();
-			
+
+			if (sendGroup == null || sendGroup.length() == 0) {
+				sendGroup = UUID.randomUUID().toString();
+			}
+
 			MessageSpec messageSpec = new MessageSpec();
 			messageSpec.setCreated(new Date());
 			messageSpec.setDestinationTeam(destinationTeam);
 			messageSpec.setJsonPayload(new Text(jsonPayloadText));
 			messageSpec.setSendGroup(sendGroup);
 			messageSpec.setSendStatus(IkafsConstants.MESSAGE_SPEC_SEND_STATUS_UNSENT);
-			
+
 			Datastore.put(messageSpec);
-			
-			Queue queue = QueueFactory.getQueue(IkafsConstants.QUEUE_NAME_DEFAULT);
-			String queueUrl = req.getServletPath() + IkafsConstants.PATH_WEBHOOK_TASK_INIT_SEND;
-			queue.add(TaskOptions.Builder.withUrl(queueUrl).param(IkafsConstants.QUEUE_PARAM_NAME_SEND_GROUP, sendGroup));
-			
+
+			if (sendGroup == null || sendGroup.length() == 0) {
+				Queue queue = QueueFactory.getQueue(IkafsConstants.QUEUE_NAME_DEFAULT);
+				String queueUrl = req.getServletPath() + IkafsConstants.PATH_WEBHOOK_TASK_INIT_SEND;
+				queue.add(TaskOptions.Builder.withUrl(queueUrl).param(IkafsConstants.QUEUE_PARAM_NAME_SEND_GROUP, sendGroup));
+			}
+
 			resp.setStatus(200);
 			resp.getWriter().write("OK");
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 			logger.log(Level.SEVERE, e.toString());
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			logger.log(Level.SEVERE, e.toString());
 			throw new IkafsServletException(null, e);
