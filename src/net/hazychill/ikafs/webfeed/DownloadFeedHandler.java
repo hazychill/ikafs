@@ -64,8 +64,10 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 				modelList.add(entryModel);
 			}
 
-			FeedUrl feedUrl = Datastore.get(FeedUrl.class, Datastore.createKey(FeedUrl.class, urlParam));
+			FeedUrl feedUrl = new FeedUrl();
+			feedUrl.setKey(Datastore.createKey(FeedUrl.class, urlParam));
 			feedUrl.setActive(false);
+			feedUrl.setUpdated(new Date());
 			modelList.add(feedUrl);
 
 			Datastore.put(modelList);

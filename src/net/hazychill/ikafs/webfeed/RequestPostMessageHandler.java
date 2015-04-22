@@ -62,9 +62,9 @@ public class RequestPostMessageHandler implements IkafsRequestHandler {
 					String feedUrl = fcr.getKey().getParent().getName();
 					FeedEntryMeta meta = FeedEntryMeta.get();
 					List<FeedEntry> entries = Datastore.query(FeedEntry.class).filter(meta.feedUrl.equal(feedUrl), meta.updated.greaterThan(fcr.getUpdated())).asList();
-					
+
 					if (entries.size() == 0) {
-						logger.info("RequestPostMessageHandler: no updates for " + fcr.getKey().getName() + ", " + fcr.getUrl());
+						logger.info("RequestPostMessageHandler: no updates for " + fcr.getKey().getName() + ", " + fcr.getKey().getParent().getName());
 						fcr.setActive(false);
 						Datastore.put(fcr);
 						continue;

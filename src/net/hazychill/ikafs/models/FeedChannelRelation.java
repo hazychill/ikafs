@@ -11,7 +11,6 @@ import com.google.appengine.api.datastore.Key;
 public class FeedChannelRelation {
 	@Attribute(primaryKey = true)
 	Key key;
-	String url;
 	boolean active;
 	Date updated;
 
@@ -21,14 +20,6 @@ public class FeedChannelRelation {
 
 	public void setKey(Key key) {
 		this.key = key;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	public boolean isActive() {

@@ -100,7 +100,6 @@ public class FindSourcesHandler implements IkafsRequestHandler {
 						feedChannelRelation.setKey(fcrKey);
 						feedChannelRelation.setUpdated(new Date());
 					}
-					feedChannelRelation.setUrl(url);
 					feedChannelRelation.setActive(true);
 					models.add(feedChannelRelation);
 				}
