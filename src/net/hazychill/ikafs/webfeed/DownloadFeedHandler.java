@@ -21,6 +21,7 @@ import net.hazychill.ikafs.models.FeedEntry;
 import net.hazychill.ikafs.models.FeedUrl;
 import net.hazychill.ikafs.webhooks.IkafsServletException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slim3.datastore.Datastore;
 
 import com.google.appengine.api.datastore.Key;
@@ -119,42 +120,32 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 			updated = entry.getPublishedDate();
 		}
 
+		SyndContent content = null;
 		if (entry.getContents().size() > 0) {
-			SyndContent content = (SyndContent) entry.getContents().get(0);
+			content = (SyndContent) entry.getContents().get(0);
+		}
+		else {
+			content = entry.getDescription();
+		}
+		if (content != null) {
 			if (content.getType() == null || content.getType().startsWith("text/plain")) {
-				String contentValue = content.getValue();
-				int contentLength = contentValue.length();
-				int summaryLength = (contentLength < maxSummaryLength) ? (contentLength) : (maxSummaryLength);
-				summary = content.getValue().substring(0, summaryLength);
+				summary = content.getValue();
 			}
 			else {
-				String contentValue = content.getValue().replaceAll("(?s)<.+?>", " ");
-				int contentLength = contentValue.length();
-				int summaryLength = (contentLength < maxSummaryLength) ? (contentLength) : (maxSummaryLength);
-				summary = contentValue.substring(0, summaryLength);
+				summary = content.getValue().replaceAll("(?s)<.+?>", " ").replaceAll(" +", " ");
+				summary = StringEscapeUtils.unescapeHtml4(summary);
 			}
 		}
 		else {
-			SyndContent content = entry.getDescription();
-			if (content.getType() == null || content.getType().startsWith("text/plain")) {
-				String contentValue = content.getValue();
-				int contentLength = contentValue.length();
-				int summaryLength = (contentLength < maxSummaryLength) ? (contentLength) : (maxSummaryLength);
-				summary = content.getValue().substring(0, summaryLength);
-			}
-			else {
-				String contentValue = content.getValue().replaceAll("(?s)<.+?>", " ");
-				int contentLength = contentValue.length();
-				int summaryLength = (contentLength < maxSummaryLength) ? (contentLength) : (maxSummaryLength);
-				summary = contentValue.substring(0, summaryLength);
-			}
+			summary = entry.getTitle();
 		}
+		int summaryLength = (summary.length() < maxSummaryLength) ? (summary.length()) : (maxSummaryLength);
+		summary = summary.substring(0, summaryLength);
 
-		if (entry.getContents().size() > 0) {
-			SyndContent content = (SyndContent) entry.getContents().get(0);
+		if (content != null) {
 			String contentValue = content.getValue();
-			// <img [^>]*src="([^"]+?)"
-			Pattern pattern = Pattern.compile("<img [^>]*src=\"([^\"]+?)\"");
+			// <img [^>]*src=["'](.+?)["']
+			Pattern pattern = Pattern.compile("<img [^>]*src=[\"\'](.+?)[\"\']");
 			Matcher matcher = pattern.matcher(contentValue);
 			if (matcher.find()) {
 				image = matcher.group(1);
