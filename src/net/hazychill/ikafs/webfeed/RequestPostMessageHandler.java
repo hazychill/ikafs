@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
+import net.hazychill.ikafs.IkafsServletException;
 import net.hazychill.ikafs.models.FeedChannelRelation;
 import net.hazychill.ikafs.models.FeedChannelRelationMeta;
 import net.hazychill.ikafs.models.FeedEntry;
 import net.hazychill.ikafs.models.FeedEntryMeta;
-import net.hazychill.ikafs.webhooks.IkafsServletException;
 
 import org.slim3.datastore.Datastore;
 

@@ -1,4 +1,4 @@
-package net.hazychill.ikafs.webhooks;
+package net.hazychill.ikafs;
 
 import javax.servlet.ServletException;
 

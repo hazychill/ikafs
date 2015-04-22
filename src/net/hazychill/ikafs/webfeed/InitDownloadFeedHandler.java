@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
+import net.hazychill.ikafs.IkafsServletException;
 import net.hazychill.ikafs.models.FeedUrl;
 import net.hazychill.ikafs.models.FeedUrlMeta;
-import net.hazychill.ikafs.webhooks.IkafsServletException;
 
 import org.slim3.datastore.Datastore;
 

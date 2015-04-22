@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
+import net.hazychill.ikafs.IkafsServletException;
 import net.hazychill.ikafs.models.MessageSpec;
 import net.hazychill.ikafs.models.SlackTeam;
 

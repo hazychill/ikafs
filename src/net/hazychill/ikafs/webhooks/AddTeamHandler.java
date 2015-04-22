@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
+import net.hazychill.ikafs.IkafsServletException;
 import net.hazychill.ikafs.models.SlackTeam;
 
 import org.slim3.datastore.Datastore;
