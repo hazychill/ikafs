@@ -8,17 +8,30 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>IncomingWebhookServlet</servlet-name>
 		<servlet-class>net.hazychill.ikafs.webhooks.IncomingWebhookServlet</servlet-class>
 	</servlet>
+
 	<servlet>
 		<servlet-name>WebFeedServiceServlet</servlet-name>
 		<servlet-class>net.hazychill.ikafs.webfeed.WebFeedServiceServlet</servlet-class>
 	</servlet>
+
+	<servlet>
+		<servlet-name>MaintenanceServlet</servlet-name>
+		<servlet-class>net.hazychill.ikafs.misc.MaintenanceServlet</servlet-class>
+	</servlet>
+
 	<servlet-mapping>
 		<servlet-name>IncomingWebhookServlet</servlet-name>
 		<url-pattern>/webhook/*</url-pattern>
 	</servlet-mapping>
+
 	<servlet-mapping>
 		<servlet-name>WebFeedServiceServlet</servlet-name>
 		<url-pattern>/webfeed/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>MaintenanceServlet</servlet-name>
+		<url-pattern>/misc/*</url-pattern>
 	</servlet-mapping>
 
 	<security-constraint>

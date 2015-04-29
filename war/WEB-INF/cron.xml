@@ -20,4 +20,25 @@
 		<description>post messages to slack</description>
 		<schedule>every 1 hours from 00:00 to 23:00</schedule>
 	</cron>
+	<cron>
+		<url>/misc/batch_delete</url>
+		<description>remove finished or expired entities from datastore</description>
+		<schedule>every day 00:10</schedule>
+	</cron>
 </cronentries>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

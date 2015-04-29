@@ -16,6 +16,10 @@ public class IkafsConstants {
 	public static final String PATH_WEBFEED_REQUEST_POST_MESSAGE = "/task/request_post_message";
 	public static final String PATH_WEBFEED_ADD_SOURCE = "/admin/add_source";
 
+	public static final String PATH_MISC_CONFIG = "/config";
+	public static final String PATH_MISC_BATCH_DELETE = "/batch_delete";
+	public static final String PATH_MISC_EXEC_DELETE = "/task/exec_delete";
+
 	public static final String REQUEST_PARAM_NAME_TEAM_NAME = "teamName";
 	public static final String REQUEST_PARAM_NAME_WEBHOOK_URL = "webhookUrl";
 	public static final String REQUEST_PARAM_NAME_WEBFEED_SOURCE_FILE_ID = "fileId";
@@ -77,4 +81,11 @@ public class IkafsConstants {
 	public static final String SYSPROP_KEY_SERVICE_P12_PATH = "ikafs.service.p12.path";
 
 	public static final String APPLICATION_NAME = "Ingreee Keihin Applications for Slack";
+
+	public static final String CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS = "CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS";
+	public static final String CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS = "CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS";
+
+	public static final String[] CONFIG_KEYS = new String[] { CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS, CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS };
+
+	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ssZ";
 }

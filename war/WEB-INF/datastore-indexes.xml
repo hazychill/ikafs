@@ -4,4 +4,8 @@
         <property name="feedUrl" direction="asc"/>
         <property name="updated" direction="asc"/>
     </datastore-index>
+    <datastore-index kind="MessageSpec" ancestor="false" source="manual">
+		<property name="sendStatus" direction="asc"/>
+		<property name="created" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>
