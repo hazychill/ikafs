@@ -15,9 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hazychill.ikafs.CommonUtils;
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
 import net.hazychill.ikafs.IkafsServletException;
+import net.hazychill.ikafs.misc.ConfigManager;
 import net.hazychill.ikafs.models.FeedEntry;
 import net.hazychill.ikafs.models.FeedUrl;
 
@@ -58,10 +60,18 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 
 			List<Object> modelList = new ArrayList<Object>();
 
+			ConfigManager configManager = new ConfigManager();
+			String expireDaysStr = configManager.get(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
+			int expireDays = Integer.valueOf(expireDaysStr);
+			Date expireDate = CommonUtils.calcExpireDate(expireDays);
+
 			for (Object entryObj : feed.getEntries()) {
 				SyndEntry entry = (SyndEntry) entryObj;
 				FeedEntry entryModel = readEntry(entry, urlParam, feedTitle);
-				modelList.add(entryModel);
+				Date entryUpdated = entryModel.getUpdated();
+				if (entryUpdated.compareTo(expireDate) >= 0) {
+					modelList.add(entryModel);
+				}
 			}
 
 			FeedUrl feedUrl = new FeedUrl();

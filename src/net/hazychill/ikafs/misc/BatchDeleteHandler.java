@@ -2,7 +2,6 @@ package net.hazychill.ikafs.misc;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -11,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.hazychill.ikafs.CommonUtils;
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
 import net.hazychill.ikafs.IkafsServletException;
@@ -65,9 +65,7 @@ public class BatchDeleteHandler implements IkafsRequestHandler {
 
 		String expireDaysStr = configManager.get(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
 		int expireDays = Integer.valueOf(expireDaysStr);
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_MONTH, -expireDays);
-		Date oldestUpdatedDate = cal.getTime();
+		Date oldestUpdatedDate = CommonUtils.calcExpireDate(expireDays);
 		String oldestUpdated = formatDate(oldestUpdatedDate);
 		logger.info("FeedEntry older than " + oldestUpdated + " will be deleted");
 		FeedEntryMeta feedEntryMeta = FeedEntryMeta.get();
@@ -79,9 +77,7 @@ public class BatchDeleteHandler implements IkafsRequestHandler {
 
 		expireDaysStr = configManager.get(IkafsConstants.CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS);
 		expireDays = Integer.valueOf(expireDaysStr);
-		cal = Calendar.getInstance();
-		cal.add(Calendar.DAY_OF_MONTH, -expireDays);
-		oldestUpdatedDate = cal.getTime();
+		oldestUpdatedDate = CommonUtils.calcExpireDate(expireDays);
 		oldestUpdated = formatDate(oldestUpdatedDate);
 		logger.info("MessageSpec finished or older than " + oldestUpdated + " fill be deleted");
 		MessageSpecMeta messageSpecMeta = MessageSpecMeta.get();
