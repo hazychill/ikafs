@@ -7,7 +7,7 @@ import org.slim3.datastore.Model;
 
 import com.google.appengine.api.datastore.Key;
 
-@Model
+@Model(schemaVersion = 1)
 public class FeedUrl {
 	@Attribute(primaryKey = true)
 	Key key;
