@@ -20,6 +20,8 @@ public class MaintenanceServlet extends HttpServlet {
 		handlers.put(IkafsConstants.PATH_MISC_CONFIG, new ConfigHandler());
 		handlers.put(IkafsConstants.PATH_MISC_BATCH_DELETE, new BatchDeleteHandler());
 		handlers.put(IkafsConstants.PATH_MISC_EXEC_DELETE, new BatchDeleteHandler());
+		handlers.put(IkafsConstants.PATH_MISC_ANALYZE_LOG, new AnalyzeLogHandler());
+		handlers.put(IkafsConstants.PATH_MISC_TASK_ANALYZE_LOG, new AnalyzeLogHandler());
 	}
 
 	@Override
