@@ -61,8 +61,7 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 			List<Object> modelList = new ArrayList<Object>();
 
 			ConfigManager configManager = new ConfigManager();
-			String expireDaysStr = configManager.get(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
-			int expireDays = Integer.valueOf(expireDaysStr);
+			int expireDays = configManager.getInt(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
 			Date expireDate = CommonUtils.calcExpireDate(expireDays);
 
 			for (Object entryObj : feed.getEntries()) {

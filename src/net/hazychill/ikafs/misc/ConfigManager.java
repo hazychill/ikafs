@@ -24,8 +24,8 @@ public class ConfigManager {
 
 	public void updateAll(List<ConfigEntry> configEntries) {
 		Datastore.put(configEntries);
+		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 		for (ConfigEntry entry : configEntries) {
-			MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 			String configKey = entry.getKey().getName();
 			String configValue = entry.getValue();
 			ms.put(configKey, configValue);
@@ -82,5 +82,39 @@ public class ConfigManager {
 		}
 
 		return configValue;
+	}
+
+	public void set(String configKey, String configValue) {
+		ConfigEntry entry = new ConfigEntry();
+		Key key = Datastore.createKey(ConfigEntry.class, configKey);
+		entry.setKey(key);
+		entry.setValue(configValue);
+		Datastore.put(entry);
+
+		MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+		ms.put(configKey, configValue);
+		configMap.put(configKey, configValue);
+	}
+
+	public int getInt(String configKey) {
+		String configValueStr = get(configKey);
+		int configValue = Integer.valueOf(configValueStr);
+		return configValue;
+	}
+
+	public void setInt(String configKey, int configValue) {
+		String configValueStr = Integer.toString(configValue);
+		set(configKey, configValueStr);
+	}
+
+	public long getLong(String configKey) {
+		String configValueStr = get(configKey);
+		long configValue = Long.valueOf(configValueStr);
+		return configValue;
+	}
+
+	public void setLong(String configKey, long configValue) {
+		String configValueStr = Long.toString(configValue);
+		set(configKey, configValueStr);
 	}
 }

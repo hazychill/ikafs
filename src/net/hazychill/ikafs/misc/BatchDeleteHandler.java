@@ -63,8 +63,7 @@ public class BatchDeleteHandler implements IkafsRequestHandler {
 	private void execDelete(HttpServletResponse resp, Logger logger) throws IkafsServletException {
 		ConfigManager configManager = new ConfigManager();
 
-		String expireDaysStr = configManager.get(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
-		int expireDays = Integer.valueOf(expireDaysStr);
+		int expireDays = configManager.getInt(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
 		Date oldestUpdatedDate = CommonUtils.calcExpireDate(expireDays);
 		String oldestUpdated = formatDate(oldestUpdatedDate);
 		logger.info("FeedEntry older than " + oldestUpdated + " will be deleted");
@@ -75,8 +74,7 @@ public class BatchDeleteHandler implements IkafsRequestHandler {
 			logger.info(" FeedEntry deleted: " + key.getName());
 		}
 
-		expireDaysStr = configManager.get(IkafsConstants.CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS);
-		expireDays = Integer.valueOf(expireDaysStr);
+		expireDays = configManager.getInt(IkafsConstants.CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS);
 		oldestUpdatedDate = CommonUtils.calcExpireDate(expireDays);
 		oldestUpdated = formatDate(oldestUpdatedDate);
 		logger.info("MessageSpec finished or older than " + oldestUpdated + " fill be deleted");
