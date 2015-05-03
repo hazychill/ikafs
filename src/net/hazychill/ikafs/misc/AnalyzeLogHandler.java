@@ -89,7 +89,7 @@ public class AnalyzeLogHandler implements IkafsRequestHandler {
 			reportText.append(configManager.get(IkafsConstants.CONFIG_KEY_CONSOLE_URL_LOG_LIST));
 			AppEventReport report = new AppEventReport();
 			report.setCreated(new Date());
-			report.setTitle("");
+			report.setTitle("Error log detected");
 			report.setReported(false);
 			report.setText(new Text(reportText.toString()));
 			Datastore.put(report);

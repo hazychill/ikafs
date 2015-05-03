@@ -21,6 +21,8 @@ public class IkafsConstants {
 	public static final String PATH_MISC_EXEC_DELETE = "/task/exec_delete";
 	public static final String PATH_MISC_ANALYZE_LOG = "/analyze_log";
 	public static final String PATH_MISC_TASK_ANALYZE_LOG = "/task/analyze_log";
+	public static final String PATH_MISC_SEND_REPORT = "/send_report";
+	public static final String PATH_MISC_TASK_SEND_REPORT = "/task/send_report";
 
 	public static final String REQUEST_PARAM_NAME_TEAM_NAME = "teamName";
 	public static final String REQUEST_PARAM_NAME_WEBHOOK_URL = "webhookUrl";
@@ -90,9 +92,14 @@ public class IkafsConstants {
 	public static final String CONFIG_KEY_MAX_LOG_ENTRIES_IN_REPORT = "CONFIG_KEY_MAX_LOG_ENTRIES_IN_REPORT";
 	public static final String CONFIG_KEY_CALENDAR_TIMEZONE = "CONFIG_KEY_CALENDAR_TIMEZONE";
 	public static final String CONFIG_KEY_CONSOLE_URL_LOG_LIST = "CONFIG_KEY_CONSOLE_URL_LOG_LIST";
+	public static final String CONFIG_KEY_MAX_EVENTS_IN_ONE_REPORT = "CONFIG_KEY_MAX_EVENTS_IN_ONE_REPORT";
+	public static final String CONFIG_KEY_REPORT_SENDER_NAME = "CONFIG_KEY_REPORT_SENDER_NAME";
+	public static final String CONFIG_KEY_REPORT_SENDER_ADDR = "CONFIG_KEY_REPORT_SENDER_ADDR";
+	public static final String CONFIG_KEY_REPORT_RECEIVER_EMAILS = "CONFIG_KEY_REPORT_RECEIVER_EMAILS";
 
 	public static final String[] CONFIG_KEYS = new String[] { CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS, CONFIG_KEY_MESSAGE_SPEC_EXPIRE_DAYS, CONFIG_KEY_LAST_ANALYZED_LOG_TIME,
-			CONFIG_KEY_MAX_LOG_ENTRIES_IN_REPORT, CONFIG_KEY_CALENDAR_TIMEZONE, CONFIG_KEY_CONSOLE_URL_LOG_LIST };
+			CONFIG_KEY_MAX_LOG_ENTRIES_IN_REPORT, CONFIG_KEY_CALENDAR_TIMEZONE, CONFIG_KEY_CONSOLE_URL_LOG_LIST, CONFIG_KEY_MAX_EVENTS_IN_ONE_REPORT, CONFIG_KEY_REPORT_SENDER_NAME,
+			CONFIG_KEY_REPORT_SENDER_ADDR, CONFIG_KEY_REPORT_RECEIVER_EMAILS };
 
 	public static final String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ssZ";
 }

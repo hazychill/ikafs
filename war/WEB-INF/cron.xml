@@ -25,6 +25,16 @@
 		<description>remove finished or expired entities from datastore</description>
 		<schedule>every day 00:10</schedule>
 	</cron>
+	<cron>
+		<url>/misc/analyze_log</url>
+		<description>analyze log and detect errors</description>
+		<schedule>every day 12:10</schedule>
+	</cron>
+	<cron>
+		<url>/misc/send_report</url>
+		<description>send daily report for this application</description>
+		<schedule>every day 12:20</schedule>
+	</cron>
 </cronentries>
 
 
