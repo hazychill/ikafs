@@ -71,10 +71,11 @@ public class ConfigHandler implements IkafsRequestHandler {
 					writer.write("<td>");
 					writer.write(StringEscapeUtils.escapeHtml4(configKey));
 					writer.write("</td>");
-					writer.write("<td>");
-					writer.write(StringEscapeUtils.escapeHtml4(configValue));
+					writer.write("<td><input type=\"text\" readonly=\"true\" style=\"width:300px;\" value=\"");
+					writer.write(configValue.replaceAll("\"", "&quot;").replaceAll("'", "&#x27;"));
+					writer.write("\" />");
 					writer.write("</td>");
-					writer.write("<td><input type=\"text\" name=\"");
+					writer.write("<td><input type=\"text\" style=\"width:300px;\" name=\"");
 					writer.write(configKey);
 					writer.write("\" /></td>");
 					writer.write("</tr>");
