@@ -50,6 +50,7 @@ public class ConfigManager {
 					try {
 						ConfigEntry datastoreStoredEntry = Datastore.get(ConfigEntry.class, key);
 						configValue = datastoreStoredEntry.getValue();
+						ms.put(configKey, configValue);
 					}
 					catch (EntityNotFoundRuntimeException e) {
 						configValue = "!NULL";
@@ -77,6 +78,7 @@ public class ConfigManager {
 				Key key = Datastore.createKey(ConfigEntry.class, configKey);
 				ConfigEntry entry = Datastore.get(ConfigEntry.class, key);
 				configValue = entry.getValue();
+				ms.put(configKey, configValue);
 			}
 			configMap.put(configKey, configValue);
 		}
