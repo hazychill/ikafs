@@ -54,7 +54,7 @@ public class AnalyzeLogHandler implements IkafsRequestHandler {
 		ConfigManager configManager = new ConfigManager();
 		long lastAnalyzedLogTime = configManager.getLong(IkafsConstants.CONFIG_KEY_LAST_ANALYZED_LOG_TIME);
 		LogService service = LogServiceFactory.getLogService();
-		LogQuery query = LogQuery.Builder.withIncludeAppLogs(true).startTimeUsec(lastAnalyzedLogTime + 10000).minLogLevel(LogLevel.ERROR);
+		LogQuery query = LogQuery.Builder.withIncludeAppLogs(true).startTimeUsec(lastAnalyzedLogTime + 10000);
 		int maxLogEntriesInReport = configManager.getInt(IkafsConstants.CONFIG_KEY_MAX_LOG_ENTRIES_IN_REPORT);
 		List<String> reportLogs = new ArrayList<String>();
 		for (RequestLogs log : service.fetch(query)) {
@@ -62,20 +62,22 @@ public class AnalyzeLogHandler implements IkafsRequestHandler {
 				lastAnalyzedLogTime = log.getStartTimeUsec();
 			}
 
-			if (reportLogs.size() < maxLogEntriesInReport) {
-				String calendarTimeZone = configManager.get(IkafsConstants.CONFIG_KEY_CALENDAR_TIMEZONE);
-				Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(calendarTimeZone));
-				cal.clear();
-				cal.setTimeInMillis(log.getStartTimeUsec() / 1000);
-				String appLogMessage = getAppLogMessage(log);
-				String logSummary = MessageFormat.format("{0,number,0000}-{1,number,00}-{2,number,00}T{3,number,00}:{4,number,00}:{5,number,00}.{6,number} {7} {8} {9}", cal.get(Calendar.YEAR),
-						cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND),
-						log.getStatus(), log.getResource(), appLogMessage);
-				reportLogs.add(logSummary);
-			}
-			else if (reportLogs.size() == maxLogEntriesInReport) {
-				reportLogs.add("(and more...)");
-				break;
+			if (400 <= log.getStatus() && log.getStatus() <= 599) {
+				if (reportLogs.size() < maxLogEntriesInReport) {
+					String calendarTimeZone = configManager.get(IkafsConstants.CONFIG_KEY_CALENDAR_TIMEZONE);
+					Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(calendarTimeZone));
+					cal.clear();
+					cal.setTimeInMillis(log.getStartTimeUsec() / 1000);
+					String appLogMessage = getAppLogMessage(log);
+					String logSummary = MessageFormat.format("{0,number,0000}-{1,number,00}-{2,number,00}T{3,number,00}:{4,number,00}:{5,number,00}.{6,number} {7} {8} {9}", cal.get(Calendar.YEAR),
+							cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND),
+							cal.get(Calendar.MILLISECOND), log.getStatus(), log.getResource(), appLogMessage);
+					reportLogs.add(logSummary);
+				}
+				else if (reportLogs.size() == maxLogEntriesInReport) {
+					reportLogs.add("(and more...)");
+					break;
+				}
 			}
 		}
 
