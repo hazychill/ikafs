@@ -41,8 +41,10 @@ public class PushMessageQueueHandler implements IkafsRequestHandler {
 			JSONObject jsonPayload = jsonObj.getJSONObject(IkafsConstants.JSON_KEY_MESSAGE);
 			String jsonPayloadText = jsonPayload.toString();
 
+			boolean doSend = false;
 			if (sendGroup == null || sendGroup.length() == 0) {
 				sendGroup = UUID.randomUUID().toString();
+				doSend = true;
 			}
 
 			MessageSpec messageSpec = new MessageSpec();
@@ -54,7 +56,7 @@ public class PushMessageQueueHandler implements IkafsRequestHandler {
 
 			Datastore.put(messageSpec);
 
-			if (sendGroup == null || sendGroup.length() == 0) {
+			if (doSend) {
 				Queue queue = QueueFactory.getQueue(IkafsConstants.QUEUE_NAME_DEFAULT);
 				String queueUrl = req.getServletPath() + IkafsConstants.PATH_WEBHOOK_TASK_INIT_SEND;
 				queue.add(TaskOptions.Builder.withUrl(queueUrl).param(IkafsConstants.QUEUE_PARAM_NAME_SEND_GROUP, sendGroup));
