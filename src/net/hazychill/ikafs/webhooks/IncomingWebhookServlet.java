@@ -22,6 +22,7 @@ public class IncomingWebhookServlet extends HttpServlet {
 		handlers.put(IkafsConstants.PATH_WEBHOOK_TASK_INIT_SEND, new InitiateSendHandler());
 		handlers.put(IkafsConstants.PATH_WEBHOOK_TASK_SEND, new SendMessageHandler());
 		handlers.put(IkafsConstants.PATH_WEBHOOK_ADD_TEAM, new AddTeamHandler());
+		handlers.put(IkafsConstants.PATH_WEBHOOK_SEND_TEST, new SendTestHandler());
 	}
 
 	@Override

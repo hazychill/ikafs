@@ -9,6 +9,7 @@ public class IkafsConstants {
 	public static final String PATH_WEBHOOK_TASK_INIT_SEND = "/task/init_send";
 	public static final String PATH_WEBHOOK_TASK_SEND = "/task/send";
 	public static final String PATH_WEBHOOK_ADD_TEAM = "/admin/add_team";
+	public static final String PATH_WEBHOOK_SEND_TEST = "/admin/send_test";
 
 	public static final String PATH_WEBFEED_FIND_SOURCES = "/task/find_sources";
 	public static final String PATH_WEBFEED_INIT_DOWNLOAD_FEED = "/task/init_download_feed";
@@ -25,7 +26,9 @@ public class IkafsConstants {
 	public static final String PATH_MISC_TASK_SEND_REPORT = "/task/send_report";
 
 	public static final String REQUEST_PARAM_NAME_TEAM_NAME = "teamName";
+	public static final String REQUEST_PARAM_NAME_CHENNAL_NAME = "channelName";
 	public static final String REQUEST_PARAM_NAME_WEBHOOK_URL = "webhookUrl";
+	public static final String REQUEST_PARAM_NAME_JSON_PAYLOAD = "jsonPayload";
 	public static final String REQUEST_PARAM_NAME_WEBFEED_SOURCE_FILE_ID = "fileId";
 	public static final String REQUEST_PARAM_NAME_WEBFEED_SOURCE_COMMENT = "comment";
 
