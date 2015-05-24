@@ -27,10 +27,9 @@ import com.google.appengine.api.datastore.Key;
 public class SendMessageHandler implements IkafsRequestHandler {
 
 	@Override
-	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet)
-			throws IkafsServletException {
+	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
 		Logger logger = Logger.getLogger(IkafsConstants.LOGGER_NAME);
-		
+
 		String messageKeyStr = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_MESSAGE_KEY);
 		long id = Long.parseLong(messageKeyStr);
 		Key messageKey = Datastore.createKey(MessageSpec.class, id);
@@ -61,12 +60,12 @@ public class SendMessageHandler implements IkafsRequestHandler {
 			writer.write(jsonPayload);
 			writer.flush();
 			output.flush();
-			
+
 			int status = connection.getResponseCode();
 			if (200 <= status && status <= 299) {
 				spec.setSendStatus(IkafsConstants.MESSAGE_SPEC_SEND_STATUS_SENT);
 				Datastore.put(spec);
-				
+
 				resp.setStatus(IkafsConstants.STATUS_CODE_OK);
 				resp.getWriter().write("OK");
 			}
@@ -75,8 +74,9 @@ public class SendMessageHandler implements IkafsRequestHandler {
 			}
 		}
 		catch (EntityNotFoundRuntimeException e) {
-			logger.log(Level.SEVERE, "Message to send not found: ", + id);
-		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Message to send not found: ", +id);
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			throw new IkafsServletException(null, e);
 		}
