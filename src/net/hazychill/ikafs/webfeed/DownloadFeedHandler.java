@@ -3,6 +3,7 @@ package net.hazychill.ikafs.webfeed;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,9 +50,17 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 				resp.setStatus(500);
 				return;
 			}
+			ConfigManager configManager = new ConfigManager();
+
+			int connectionTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_CONNECTION_TIMEOUT);
+			int readTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_READ_TIMEOUT);
 
 			URL url = new URL(urlParam);
-			input = url.openStream();
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setConnectTimeout(connectionTimeout);
+			connection.setReadTimeout(readTimeout);
+			connection.connect();
+			input = connection.getInputStream();
 			reader = new XmlReader(input);
 			SyndFeedInput feedInput = new SyndFeedInput();
 			SyndFeed feed = feedInput.build(reader);
@@ -60,7 +69,6 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 
 			List<Object> modelList = new ArrayList<Object>();
 
-			ConfigManager configManager = new ConfigManager();
 			int expireDays = configManager.getInt(IkafsConstants.CONFIG_KEY_FEED_ENTRY_EXPIRE_DAYS);
 			Date expireDate = CommonUtils.calcExpireDate(expireDays);
 

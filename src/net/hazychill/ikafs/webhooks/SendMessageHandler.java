@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.hazychill.ikafs.IkafsConstants;
 import net.hazychill.ikafs.IkafsRequestHandler;
 import net.hazychill.ikafs.IkafsServletException;
+import net.hazychill.ikafs.misc.ConfigManager;
 import net.hazychill.ikafs.models.MessageSpec;
 import net.hazychill.ikafs.models.SlackTeam;
 
@@ -40,15 +41,21 @@ public class SendMessageHandler implements IkafsRequestHandler {
 		try {
 			Key teamKey = Datastore.createKey(SlackTeam.class, spec.getDestinationTeam());
 			SlackTeam team = Datastore.get(SlackTeam.class, teamKey);
-			
+
 			String webhookUrl = team.getWebhookUrl();
 			String jsonPayload = spec.getJsonPayload().getValue();
-			
+
+			ConfigManager configManager = new ConfigManager();
+			int connectionTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_CONNECTION_TIMEOUT);
+			int readTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_READ_TIMEOUT);
+
 			URL requestUrl = new URL(webhookUrl);
 			HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestMethod(IkafsConstants.HTTP_METHOD_POST);
 			connection.setRequestProperty(IkafsConstants.HTTP_HEADER_NAME_CONTENT_TYPE, IkafsConstants.MIME_TYPE_JSON);
+			connection.setConnectTimeout(connectionTimeout);
+			connection.setReadTimeout(readTimeout);
 			output = connection.getOutputStream();
 			writer = new OutputStreamWriter(output, IkafsConstants.CHARSET_UTF8);
 			writer.write(jsonPayload);
