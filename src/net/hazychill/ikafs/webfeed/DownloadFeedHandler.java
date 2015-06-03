@@ -1,9 +1,9 @@
 package net.hazychill.ikafs.webfeed;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +28,12 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.slim3.datastore.Datastore;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.urlfetch.FetchOptions;
+import com.google.appengine.api.urlfetch.HTTPMethod;
+import com.google.appengine.api.urlfetch.HTTPRequest;
+import com.google.appengine.api.urlfetch.HTTPResponse;
+import com.google.appengine.api.urlfetch.URLFetchService;
+import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -52,17 +58,18 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 			}
 			ConfigManager configManager = new ConfigManager();
 
-			int connectionTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_CONNECTION_TIMEOUT);
-			int readTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_READ_TIMEOUT);
+			int urlfetchDeadlineSeconds = configManager.getInt(IkafsConstants.CONFIG_KEY_URLFETCH_DEADLINE_SECONDS);
 
 			URL url = new URL(urlParam);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setConnectTimeout(connectionTimeout);
-			connection.setReadTimeout(readTimeout);
-			connection.connect();
-			input = connection.getInputStream();
-			reader = new XmlReader(input);
+			FetchOptions options = FetchOptions.Builder.withDeadline(urlfetchDeadlineSeconds);
+			HTTPRequest request = new HTTPRequest(url, HTTPMethod.GET, options);
+			URLFetchService urlFetch = URLFetchServiceFactory.getURLFetchService();
+			HTTPResponse response = urlFetch.fetch(request);
+			byte[] content = response.getContent();
+
 			SyndFeedInput feedInput = new SyndFeedInput();
+			input = new ByteArrayInputStream(content);
+			reader = new XmlReader(input);
 			SyndFeed feed = feedInput.build(reader);
 
 			String feedTitle = feed.getTitle();

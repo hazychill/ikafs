@@ -3,7 +3,6 @@ package net.hazychill.ikafs.webhooks;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +22,13 @@ import org.slim3.datastore.Datastore;
 import org.slim3.datastore.EntityNotFoundRuntimeException;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.urlfetch.FetchOptions;
+import com.google.appengine.api.urlfetch.HTTPHeader;
+import com.google.appengine.api.urlfetch.HTTPMethod;
+import com.google.appengine.api.urlfetch.HTTPRequest;
+import com.google.appengine.api.urlfetch.HTTPResponse;
+import com.google.appengine.api.urlfetch.URLFetchService;
+import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 
 public class SendMessageHandler implements IkafsRequestHandler {
 
@@ -45,23 +51,19 @@ public class SendMessageHandler implements IkafsRequestHandler {
 			String jsonPayload = spec.getJsonPayload().getValue();
 
 			ConfigManager configManager = new ConfigManager();
-			int connectionTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_CONNECTION_TIMEOUT);
-			int readTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_READ_TIMEOUT);
+			int urlfetchDeadlineSeconds = configManager.getInt(IkafsConstants.CONFIG_KEY_URLFETCH_DEADLINE_SECONDS);
 
+			FetchOptions options = FetchOptions.Builder.withDeadline(urlfetchDeadlineSeconds);
 			URL requestUrl = new URL(webhookUrl);
-			HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
-			connection.setDoOutput(true);
-			connection.setRequestMethod(IkafsConstants.HTTP_METHOD_POST);
-			connection.setRequestProperty(IkafsConstants.HTTP_HEADER_NAME_CONTENT_TYPE, IkafsConstants.MIME_TYPE_JSON);
-			connection.setConnectTimeout(connectionTimeout);
-			connection.setReadTimeout(readTimeout);
-			output = connection.getOutputStream();
-			writer = new OutputStreamWriter(output, IkafsConstants.CHARSET_UTF8);
-			writer.write(jsonPayload);
-			writer.flush();
-			output.flush();
+			HTTPRequest request = new HTTPRequest(requestUrl, HTTPMethod.POST, options);
+			byte[] payload = jsonPayload.getBytes(IkafsConstants.CHARSET_UTF8);
+			request.setHeader(new HTTPHeader(IkafsConstants.HTTP_HEADER_NAME_CONTENT_TYPE, IkafsConstants.MIME_TYPE_JSON));
+			request.setPayload(payload);
 
-			int status = connection.getResponseCode();
+			URLFetchService urlFetch = URLFetchServiceFactory.getURLFetchService();
+			HTTPResponse response = urlFetch.fetch(request);
+
+			int status = response.getResponseCode();
 			if (200 <= status && status <= 299) {
 				spec.setSendStatus(IkafsConstants.MESSAGE_SPEC_SEND_STATUS_SENT);
 				Datastore.put(spec);
