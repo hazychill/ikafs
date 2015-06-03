@@ -3,7 +3,6 @@ package net.hazychill.ikafs.webhooks;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,14 +22,20 @@ import org.slim3.datastore.Datastore;
 import org.slim3.datastore.EntityNotFoundRuntimeException;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.urlfetch.FetchOptions;
+import com.google.appengine.api.urlfetch.HTTPHeader;
+import com.google.appengine.api.urlfetch.HTTPMethod;
+import com.google.appengine.api.urlfetch.HTTPRequest;
+import com.google.appengine.api.urlfetch.HTTPResponse;
+import com.google.appengine.api.urlfetch.URLFetchService;
+import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 
 public class SendMessageHandler implements IkafsRequestHandler {
 
 	@Override
-	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet)
-			throws IkafsServletException {
+	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
 		Logger logger = Logger.getLogger(IkafsConstants.LOGGER_NAME);
-		
+
 		String messageKeyStr = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_MESSAGE_KEY);
 		long id = Long.parseLong(messageKeyStr);
 		Key messageKey = Datastore.createKey(MessageSpec.class, id);
@@ -46,27 +51,23 @@ public class SendMessageHandler implements IkafsRequestHandler {
 			String jsonPayload = spec.getJsonPayload().getValue();
 
 			ConfigManager configManager = new ConfigManager();
-			int connectionTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_CONNECTION_TIMEOUT);
-			int readTimeout = configManager.getInt(IkafsConstants.CONFIG_KEY_URLCONNECTION_READ_TIMEOUT);
+			int urlfetchDeadlineSeconds = configManager.getInt(IkafsConstants.CONFIG_KEY_URLFETCH_DEADLINE_SECONDS);
 
+			FetchOptions options = FetchOptions.Builder.withDeadline(urlfetchDeadlineSeconds);
 			URL requestUrl = new URL(webhookUrl);
-			HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
-			connection.setDoOutput(true);
-			connection.setRequestMethod(IkafsConstants.HTTP_METHOD_POST);
-			connection.setRequestProperty(IkafsConstants.HTTP_HEADER_NAME_CONTENT_TYPE, IkafsConstants.MIME_TYPE_JSON);
-			connection.setConnectTimeout(connectionTimeout);
-			connection.setReadTimeout(readTimeout);
-			output = connection.getOutputStream();
-			writer = new OutputStreamWriter(output, IkafsConstants.CHARSET_UTF8);
-			writer.write(jsonPayload);
-			writer.flush();
-			output.flush();
-			
-			int status = connection.getResponseCode();
+			HTTPRequest request = new HTTPRequest(requestUrl, HTTPMethod.POST, options);
+			byte[] payload = jsonPayload.getBytes(IkafsConstants.CHARSET_UTF8);
+			request.setHeader(new HTTPHeader(IkafsConstants.HTTP_HEADER_NAME_CONTENT_TYPE, IkafsConstants.MIME_TYPE_JSON));
+			request.setPayload(payload);
+
+			URLFetchService urlFetch = URLFetchServiceFactory.getURLFetchService();
+			HTTPResponse response = urlFetch.fetch(request);
+
+			int status = response.getResponseCode();
 			if (200 <= status && status <= 299) {
 				spec.setSendStatus(IkafsConstants.MESSAGE_SPEC_SEND_STATUS_SENT);
 				Datastore.put(spec);
-				
+
 				resp.setStatus(IkafsConstants.STATUS_CODE_OK);
 				resp.getWriter().write("OK");
 			}
@@ -75,8 +76,9 @@ public class SendMessageHandler implements IkafsRequestHandler {
 			}
 		}
 		catch (EntityNotFoundRuntimeException e) {
-			logger.log(Level.SEVERE, "Message to send not found: ", + id);
-		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Message to send not found: ", +id);
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			throw new IkafsServletException(null, e);
 		}
