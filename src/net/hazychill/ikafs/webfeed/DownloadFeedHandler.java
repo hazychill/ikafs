@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,11 +48,11 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
 		Logger logger = Logger.getLogger(IkafsConstants.LOGGER_NAME);
-		
+
 		String urlParam = null;
 
 		InputStream input = null;
-		Reader reader = null;
+		XmlReader reader = null;
 		try {
 			urlParam = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_URL);
 			if (urlParam == null || urlParam.length() == 0) {
@@ -72,7 +74,11 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 			SyndFeedInput feedInput = new SyndFeedInput();
 			input = new ByteArrayInputStream(content);
 			reader = new XmlReader(input);
-			SyndFeed feed = feedInput.build(reader);
+			String encoding = reader.getEncoding();
+			String feedContent = new String(content, Charset.forName(encoding));
+			feedContent = stripInvalidXmlCharacters(feedContent);
+			Reader feedReader = new StringReader(feedContent);
+			SyndFeed feed = feedInput.build(feedReader);
 
 			String feedTitle = feed.getTitle();
 
@@ -131,6 +137,21 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 				}
 			}
 		}
+	}
+
+	private String stripInvalidXmlCharacters(String inputText) {
+		String output = inputText;
+		if (output == null) {
+			return null;
+		}
+		String[] invalidCharPatterns = new String[] {
+				"[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]"
+		};
+		for (String invalidCharPattern : invalidCharPatterns) {
+			output = output.replaceAll(invalidCharPattern, "\uFFFD");
+		}
+
+		return output;
 	}
 
 	private FeedEntry readEntry(SyndEntry entry, String feedUrl, String feedTitle) {
