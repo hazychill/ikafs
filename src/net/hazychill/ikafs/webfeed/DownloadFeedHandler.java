@@ -46,11 +46,13 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
 		Logger logger = Logger.getLogger(IkafsConstants.LOGGER_NAME);
+		
+		String urlParam = null;
 
 		InputStream input = null;
 		Reader reader = null;
 		try {
-			String urlParam = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_URL);
+			urlParam = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_URL);
 			if (urlParam == null || urlParam.length() == 0) {
 				logger.severe("DownloadFeedHandler: no query parameter");
 				resp.setStatus(500);
@@ -98,14 +100,17 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+			logger.severe("error occured while processing " + urlParam);
 			throw new IkafsServletException(null, e);
 		}
 		catch (IllegalArgumentException e) {
 			e.printStackTrace();
+			logger.severe("error occured while processing " + urlParam);
 			throw new IkafsServletException(null, e);
 		}
 		catch (FeedException e) {
 			e.printStackTrace();
+			logger.severe("error occured while processing " + urlParam);
 			throw new IkafsServletException(null, e);
 		}
 		finally {
