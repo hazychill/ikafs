@@ -29,10 +29,11 @@ import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.gson.Gson;
 
 public class SendMessageHandler implements IkafsRequestHandler {
+	
+	private static Gson gson = new Gson();
 
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
@@ -107,54 +108,45 @@ public class SendMessageHandler implements IkafsRequestHandler {
 	}
 
 	private String truncateUsername(String jsonPayload, ConfigManager configManager, Logger logger) throws IkafsServletException {
-		try {
-			int maxUsernameBytes = configManager.getInt(IkafsConstants.CONFIG_KEY_MAX_USERNAME_BYTES);
-			JSONObject messageJson = new JSONObject(jsonPayload);
-			String origUsername = messageJson.getString(IkafsConstants.JSON_KEY_USERNAME);
+		int maxUsernameBytes = configManager.getInt(IkafsConstants.CONFIG_KEY_MAX_USERNAME_BYTES);
+		IncomingWebhookPayload payload = gson.fromJson(jsonPayload, IncomingWebhookPayload.class);
+		String origUsername = payload.getUsername();
 
-			if (origUsername == null || origUsername.length() == 0) {
-				return jsonPayload;
-			}
+		if (origUsername == null || origUsername.length() == 0) {
+			return jsonPayload;
+		}
 
-			String newUsername;
-			if (origUsername.length() > maxUsernameBytes) {
-				newUsername = origUsername.substring(0, maxUsernameBytes);
+		String newUsername;
+		if (origUsername.length() > maxUsernameBytes) {
+			newUsername = origUsername.substring(0, maxUsernameBytes);
+		}
+		else {
+			newUsername = origUsername;
+		}
+
+		while (true) {
+			byte[] bytes = newUsername.getBytes(IkafsConstants.CHARSET_UTF8);
+			if (bytes.length <= maxUsernameBytes) {
+				break;
 			}
 			else {
-				newUsername = origUsername;
-			}
-
-			while (true) {
-				byte[] bytes = newUsername.getBytes(IkafsConstants.CHARSET_UTF8);
-				if (bytes.length <= maxUsernameBytes) {
-					break;
+				if (newUsername.length() > 0) {
+					newUsername = newUsername.substring(0, newUsername.length()-1);
 				}
 				else {
-					if (newUsername.length() > 0) {
-						newUsername = newUsername.substring(0, newUsername.length()-1);
-					}
-					else {
-						break;
-					}
+					break;
 				}
 			}
-
-			if (!origUsername.equals(newUsername)) {
-				logger.info("username truncated from \"" + origUsername + "\" to \"" + newUsername + "\"");
-				messageJson.remove(IkafsConstants.JSON_KEY_USERNAME);
-				messageJson.put(IkafsConstants.JSON_KEY_USERNAME, newUsername);
-				return messageJson.toString();
-			}
-			else {
-				return jsonPayload;
-			}
-
 		}
-		catch (JSONException e) {
-			e.printStackTrace();
-			throw new IkafsServletException(null, e);
+
+		if (!origUsername.equals(newUsername)) {
+			logger.info("username truncated from \"" + origUsername + "\" to \"" + newUsername + "\"");
+			payload.setUsername(newUsername);
+			return gson.toJson(payload);
 		}
-		finally {}
+		else {
+			return jsonPayload;
+		}
 	}
 
 }

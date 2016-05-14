@@ -22,6 +22,9 @@ import net.hazychill.ikafs.models.FeedChannelRelation;
 import net.hazychill.ikafs.models.FeedChannelRelationMeta;
 import net.hazychill.ikafs.models.FeedEntry;
 import net.hazychill.ikafs.models.FeedEntryMeta;
+import net.hazychill.ikafs.webhooks.IncomingWebhookPayload;
+import net.hazychill.ikafs.webhooks.MessageAttachment;
+import net.hazychill.ikafs.webhooks.SendRequestPack;
 
 import org.slim3.datastore.Datastore;
 
@@ -34,8 +37,11 @@ import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.gson.Gson;
 
 public class RequestPostMessageHandler implements IkafsRequestHandler {
+	
+	private static Gson gson = new Gson();
 
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
@@ -50,8 +56,8 @@ public class RequestPostMessageHandler implements IkafsRequestHandler {
 				return;
 			}
 
-			Map<String, JSONObject> entryJsonMap = new HashMap<String, JSONObject>();
-
+			Map<String, SendRequestPack> entryJsonMap = new HashMap<String, SendRequestPack>();
+			
 			List<Object> models = new ArrayList<Object>();
 
 			boolean error = false;
@@ -81,21 +87,22 @@ public class RequestPostMessageHandler implements IkafsRequestHandler {
 						if (lastUpdated.compareTo(entry.getUpdated()) < 0) {
 							lastUpdated = entry.getUpdated();
 						}
-						JSONObject entryJson;
+						SendRequestPack pack;
 						String link = entry.getKey().getName();
 						if (entryJsonMap.containsKey(link)) {
-							JSONObject original = entryJsonMap.get(link);
-							entryJson = new JSONObject(original.toString());
-							entryJson.put(IkafsConstants.JSON_KEY_DESCTINATION, team);
-							((JSONObject) entryJson.get(IkafsConstants.JSON_KEY_MESSAGE)).put(IkafsConstants.JSON_KEY_CHANNEL, channel);
+							SendRequestPack original = entryJsonMap.get(link);
+							pack = gson.fromJson(gson.toJson(original), SendRequestPack.class);
+							pack.setDestination(team);
+							pack.getMessage().setChannel(channel);
 						}
 						else {
-							entryJson = createEntryJson(entry, team, channel);
-							entryJsonMap.put(link, entryJson);
+							pack = createEntryPack(entry, team, channel);
+							entryJsonMap.put(link, pack);
 						}
 
 						String cacheKey = UUID.randomUUID().toString();
-						ms.put(cacheKey, entryJson.toString());
+						String json = gson.toJson(pack);
+						ms.put(cacheKey, json);
 
 						Queue queue = QueueFactory.getQueue(IkafsConstants.QUEUE_NAME_DEFAULT);
 						String queueUrl = IkafsConstants.PATH_SERVLET_CONTEXT_WEBHOOK + IkafsConstants.PATH_WEBHOOK_TASK_PUSH;
@@ -127,33 +134,31 @@ public class RequestPostMessageHandler implements IkafsRequestHandler {
 		}
 	}
 
-	private JSONObject createEntryJson(FeedEntry entry, String team, String channel) throws JSONException {
-		JSONObject entryJson = new JSONObject();
-		entryJson.put(IkafsConstants.JSON_KEY_DESCTINATION, team);
+	private SendRequestPack createEntryPack(FeedEntry entry, String team, String channel) {
+		SendRequestPack pack = new SendRequestPack();
+		pack.setDestination(team);
+		
+		IncomingWebhookPayload payload = new IncomingWebhookPayload();
+		pack.setMessage(payload);
 
-		JSONObject messageJson = new JSONObject();
-		entryJson.put(IkafsConstants.JSON_KEY_MESSAGE, messageJson);
-		messageJson.put(IkafsConstants.JSON_KEY_CHANNEL, channel);
-		messageJson.put(IkafsConstants.JSON_KEY_USERNAME, entry.getFeedTitle());
-		messageJson.put(IkafsConstants.JSON_KEY_ICONEMOJI, IkafsConstants.JSON_VALUE_ICONEMOJI_WEBFEED);
+		payload.setChannel(channel);
+		payload.setUsername(entry.getFeedTitle());
+		payload.setIcon_emoji(IkafsConstants.JSON_VALUE_ICONEMOJI_WEBFEED);
 
-		JSONArray attachments = new JSONArray();
-		messageJson.put(IkafsConstants.JSON_KEY_ATTACHMENTS, attachments);
+		MessageAttachment attachment = new MessageAttachment();
+		payload.setAttachments(new MessageAttachment[] { attachment });
 
-		JSONObject attachmentBody = new JSONObject();
-		attachments.put(attachmentBody);
 		String entryLink = entry.getKey().getName();
 		String fallback = MessageFormat.format(IkafsConstants.MESSAGE_FORMAT_FALLBACK, entryLink, entry.getTitle());
-		attachmentBody.put(IkafsConstants.JSON_KEY_FALLBACK, fallback);
-		attachmentBody.put(IkafsConstants.JSON_KEY_TITLE, entry.getTitle());
-		attachmentBody.put(IkafsConstants.JSON_KEY_TITLELINK, entryLink);
-		attachmentBody.put(IkafsConstants.JSON_KEY_TEXT, entry.getSummary());
+		attachment.setFallback(fallback);
+		attachment.setTitle(entry.getTitle());
+		attachment.setTitle_link(entryLink);
+		attachment.setText(entry.getSummary());
 		String image = entry.getImage();
 		if (image != null && image.length() > 0) {
-			attachmentBody.put(IkafsConstants.JSON_KEY_IMAGEURL, image);
+			attachment.setImage_url(image);
 		}
 
-		return entryJson;
+		return pack;
 	}
-
 }

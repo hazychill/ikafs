@@ -1,6 +1,5 @@
 package net.hazychill.ikafs.webhooks;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.UUID;
@@ -19,10 +18,11 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.gson.Gson;
 
 public class ReceiveMessageRequestHandler implements IkafsRequestHandler {
+	
+	private static Gson gson = new Gson();
 
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
@@ -54,11 +54,12 @@ public class ReceiveMessageRequestHandler implements IkafsRequestHandler {
 					totalRead += read;
 				}
 				inputJsonText = new String(jsonBytes, IkafsConstants.CHARSET_UTF8);
-				JSONObject jsonObj = new JSONObject(inputJsonText);
-				
+				SendRequestPack pack = gson.fromJson(inputJsonText, SendRequestPack.class);
+
 				String cacheKey = UUID.randomUUID().toString();
 				MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
-				ms.put(cacheKey, jsonObj.toString());
+				String packJson = gson.toJson(pack);
+				ms.put(cacheKey, packJson);
 				
 				Queue queue = QueueFactory.getQueue(IkafsConstants.QUEUE_NAME_DEFAULT);
 				String queueUrl = req.getServletPath() + IkafsConstants.PATH_WEBHOOK_TASK_PUSH;
@@ -85,17 +86,6 @@ public class ReceiveMessageRequestHandler implements IkafsRequestHandler {
 					}
 				}
 			}
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-			resp.setStatus(IkafsConstants.STATUS_CODE_BAD_REQUEST);
-			try {
-				resp.getWriter().write("invalid json");
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				throw new IkafsServletException("error", e1);
-			}
-			return;
 		}
 		catch (Exception e) {
 			throw new IkafsServletException("error", e);

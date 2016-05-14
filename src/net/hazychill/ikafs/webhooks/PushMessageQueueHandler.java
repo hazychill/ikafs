@@ -23,10 +23,11 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.gson.Gson;
 
 public class PushMessageQueueHandler implements IkafsRequestHandler {
+	
+	private static Gson gson = new Gson();
 
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
@@ -35,11 +36,11 @@ public class PushMessageQueueHandler implements IkafsRequestHandler {
 			String cacheKey = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_CACHE_KEY);
 			String sendGroup = req.getParameter(IkafsConstants.QUEUE_PARAM_NAME_SEND_GROUP);
 			MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
-			String jsonObjStr = (String) ms.get(cacheKey);
-			JSONObject jsonObj = new JSONObject(jsonObjStr);
-			String destinationTeam = jsonObj.getString(IkafsConstants.JSON_KEY_DESCTINATION);
-			JSONObject jsonPayload = jsonObj.getJSONObject(IkafsConstants.JSON_KEY_MESSAGE);
-			String jsonPayloadText = jsonPayload.toString();
+			String packJson = (String)ms.get(cacheKey);
+			SendRequestPack pack = gson.fromJson(packJson, SendRequestPack.class);
+			String destinationTeam = pack.getDestination();
+			IncomingWebhookPayload payload = pack.getMessage();
+			String jsonPayloadText = gson.toJson(payload);
 
 			boolean doSend = false;
 			if (sendGroup == null || sendGroup.length() == 0) {
@@ -64,10 +65,6 @@ public class PushMessageQueueHandler implements IkafsRequestHandler {
 
 			resp.setStatus(200);
 			resp.getWriter().write("OK");
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-			logger.log(Level.SEVERE, e.toString());
 		}
 		catch (IOException e) {
 			e.printStackTrace();

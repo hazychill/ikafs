@@ -24,10 +24,11 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.gson.Gson;
 
 public class SendTestHandler implements IkafsRequestHandler {
+	
+	Gson gson = new Gson();
 
 	@Override
 	public void handle(HttpServletRequest req, HttpServletResponse resp, HttpServlet servlet) throws IkafsServletException {
@@ -38,16 +39,18 @@ public class SendTestHandler implements IkafsRequestHandler {
 			String team = req.getParameter(IkafsConstants.REQUEST_PARAM_NAME_TEAM_NAME);
 			String jsonPayloadStr = req.getParameter(IkafsConstants.REQUEST_PARAM_NAME_JSON_PAYLOAD);
 			if ((IkafsConstants.HTTP_METHOD_POST.equals(method)) && (team != null && team.length() > 0) && (jsonPayloadStr != null && jsonPayloadStr.length() > 0)) {
-				JSONObject json = new JSONObject();
-				json.put(IkafsConstants.JSON_KEY_DESCTINATION, team);
-				JSONObject jsonPayload = new JSONObject(jsonPayloadStr);
-				json.put(IkafsConstants.JSON_KEY_MESSAGE, jsonPayload);
-
+				SendRequestPack pack = new SendRequestPack();
+				pack.setDestination(team);
+				
+				IncomingWebhookPayload payload = gson.fromJson(jsonPayloadStr, IncomingWebhookPayload.class);
+				pack.setMessage(payload);
+				
 				String cacheKey = UUID.randomUUID().toString();
-				String jsonStr = json.toString();
+				String jsonStr = gson.toJson(pack);
 				logger.info("test message: " + jsonStr);
 				MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
-				ms.put(cacheKey, jsonStr);
+				String packJson = gson.toJson(pack);
+				ms.put(cacheKey, packJson);
 
 				Queue queue = QueueFactory.getQueue(IkafsConstants.QUEUE_NAME_DEFAULT);
 				String queueUrl = req.getServletPath() + IkafsConstants.PATH_WEBHOOK_TASK_PUSH;
@@ -74,10 +77,6 @@ public class SendTestHandler implements IkafsRequestHandler {
 			writer.write("</table>");
 			writer.write("<input type=\"submit\" name=\"submit\" />");
 			writer.write("</form>");
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-			throw new IkafsServletException(null, e);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
