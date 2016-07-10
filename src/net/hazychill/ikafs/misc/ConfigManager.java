@@ -119,4 +119,21 @@ public class ConfigManager {
 		String configValueStr = Long.toString(configValue);
 		set(configKey, configValueStr);
 	}
+
+	public boolean getBoolean(String configKey) {
+		String configValueStr = get(configKey);
+		boolean configValue = ("true".equals(configValueStr));
+		return configValue;
+	}
+
+	public void setBoolean(String configKey, boolean configValue) {
+		String configValueStr;
+		if (configValue == true) {
+			configValueStr = "true";
+		}
+		else {
+			configValueStr = "false";
+		}
+		set(configKey, configValueStr);
+	}
 }

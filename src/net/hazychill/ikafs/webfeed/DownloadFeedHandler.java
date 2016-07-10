@@ -155,7 +155,8 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 	}
 
 	private FeedEntry readEntry(SyndEntry entry, String feedUrl, String feedTitle) {
-		int maxSummaryLength = 200;
+		ConfigManager configManager = new ConfigManager();
+		int maxSummaryLength = configManager.getInt(IkafsConstants.CONFIG_KEY_ENTRY_MAX_SUMMARY_LENGTH);
 
 		String link;
 		String title;
@@ -218,7 +219,11 @@ public class DownloadFeedHandler implements IkafsRequestHandler {
 		entryModel.setTitle(title);
 		entryModel.setUpdated(updated);
 		entryModel.setSummary(summary);
-		entryModel.setImage(image);
+
+		boolean includeImage = configManager.getBoolean(IkafsConstants.CONFIG_KEY_ENTRY_INCLUDE_IMAGE);
+		if (includeImage) {
+			entryModel.setImage(image);
+		}
 
 		return entryModel;
 	}
