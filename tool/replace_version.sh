@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ORIG_FILE=war/WEB-INF/appengine-web.xml
+ORIG_FILE=src/main/webapp/WEB-INF/appengine-web.xml
 OLD_FILE="${ORIG_FILE}.old"
 NEW_FILE="${ORIG_FILE}.new"
 

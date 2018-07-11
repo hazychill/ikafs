@@ -1,6 +1,5 @@
-/war/WEB-INF/appengine-web.xml
-war/WEB-INF/appengine-web.xml.old
-/war/WEB-INF/appengine-generated/
-/war/WEB-INF/classes/
-*Meta.java
-*.p12
+/build/
+/src/main/webapp/WEB-INF/appengine-generated/
+/src/main/webapp/WEB-INF/appengine-web.xml
+/src/main/webapp/WEB-INF/appengine-web.xml.old
+/src/main/java/net/hazychill/ikafs/models/*Meta.java
